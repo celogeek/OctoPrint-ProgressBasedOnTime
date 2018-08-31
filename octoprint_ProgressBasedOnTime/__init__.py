@@ -52,7 +52,8 @@ def _updateProgressDataCallback(self):
                                                                             statisticalTotalPrintTime,
                                                                             statisticalTotalPrintTimeType)
 
-                    time_progress = printTime / (printTime + printTimeLeft)
+                    if printTimeLeft is not None:
+                        time_progress = printTime / (printTime + printTimeLeft)
 
             time_progress_int = int(time_progress * 100)
             if self._lastProgressReport != time_progress_int:
