@@ -7,43 +7,23 @@ description: Replace file based progression by time based progression
 author: Celogeek
 license: AGPLv3
 
-# TODO
-date: today's date in format YYYY-MM-DD, e.g. 2015-04-21
+date: 2018-09-01
 
 homepage: https://github.com/celogeek/OctoPrint-ProgressBasedOnTime
 source: https://github.com/celogeek/OctoPrint-ProgressBasedOnTime
 archive: https://github.com/celogeek/OctoPrint-ProgressBasedOnTime/archive/master.zip
 
-# TODO
 # Set this to true if your plugin uses the dependency_links setup parameter to include
 # library versions not yet published on PyPi. SHOULD ONLY BE USED IF THERE IS NO OTHER OPTION!
-#follow_dependency_links: false
+follow_dependency_links: false
 
-# TODO
 tags:
-- a list
-- of tags
-- that apply
-- to your plugin
-- (take a look at the existing plugins for what makes sense here)
-
-# TODO
-screenshots:
-- url: url of a screenshot, /assets/img/...
-  alt: alt-text of a screenshot
-  caption: caption of a screenshot
-- url: url of another screenshot, /assets/img/...
-  alt: alt-text of another screenshot
-  caption: caption of another screenshot
-- ...
-
-# TODO
-featuredimage: url of a featured image for your plugin, /assets/img/...
-
-# TODO
-# You only need the following if your plugin requires specific OctoPrint versions or
-# specific operating systems to function - you can safely remove the whole
-# "compatibility" block if this is not the case.
+- progress
+- analysis
+- estimation
+- estimator
+- print time
+- time
 
 compatibility:
 
@@ -58,7 +38,7 @@ compatibility:
   # OctoPrint versions being supported.
 
   octoprint:
-  - 1.2.0
+  - 1.3.9
 
   # List of compatible operating systems
   #
@@ -85,5 +65,17 @@ compatibility:
 
 ---
 
-**TODO**: Longer description of your plugin, configuration examples etc. This part will be visible on the page at
-http://plugins.octoprint.org/plugin/ProgressBasedOnTime/
+This plugin will change the way octoprint send back progress information to the plugins and apps.
+
+Octoprint send progress information based on file progression.
+
+This plugin will send progress information based on the time left to print.
+
+It will apply change for all plugin and apps that display progression information. It keep sending file progress to the estimators.
+
+I suggest to associate those plugins:
+ * Print Time Genius (https://plugins.octoprint.org/plugins/PrintTimeGenius/)
+ * DetailedProgress (https://plugins.octoprint.org/plugins/detailedprogress/).
+
+
+
