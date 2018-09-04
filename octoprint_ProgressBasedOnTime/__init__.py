@@ -55,10 +55,10 @@ def _updateProgressDataCallback(self):
                     if printTimeLeft is not None:
                         time_progress = printTime / (printTime + printTimeLeft)
 
-            time_progress_int = int(time_progress * 100)
+            time_progress_int = int(time_progress * 1000)
             if self._lastProgressReport != time_progress_int:
                     self._lastProgressReport = time_progress_int
-                    self._reportPrintProgressToPlugins(time_progress_int)
+                    self._reportPrintProgressToPlugins(time_progress_int / 10)
 
     return self._dict(
                         completion=time_progress * 100 if time_progress is not None else None,
