@@ -11,62 +11,30 @@ from __future__ import absolute_import
 
 import types
 import octoprint.plugin
+import logging
 
-def _updateProgressDataCallback(self):
-    if self._comm is None:
-            progress = None
-            filepos = None
-            printTime = None
-            cleanedPrintTime = None
-            time_progress = None
-    else:
-            progress = self._comm.getPrintProgress()
-            time_progress = 0.0
-            filepos = self._comm.getPrintFilepos()
-            printTime = self._comm.getPrintTime()
-            cleanedPrintTime = self._comm.getCleanedPrintTime()
 
-    printTimeLeft = printTimeLeftOrigin = None
-    estimator = self._estimator
-    if progress is not None:
-            if progress == 0:
-                    printTimeLeft = None
-                    printTimeLeftOrigin = None
-                    time_progress = 0.0
-            elif progress == 1.0:
-                    printTimeLeft = 0
-                    printTimeLeftOrigin = None
-                    time_progress = 1.0
-            elif estimator is not None:
-                    statisticalTotalPrintTime = None
-                    statisticalTotalPrintTimeType = None
-                    with self._selectedFileMutex:
-                            if self._selectedFile and "estimatedPrintTime" in self._selectedFile \
-                                            and self._selectedFile["estimatedPrintTime"]:
-                                    statisticalTotalPrintTime = self._selectedFile["estimatedPrintTime"]
-                                    statisticalTotalPrintTimeType = self._selectedFile.get("estimatedPrintTimeType", None)
+def progressCallBack(origCallback, plugin):
+    def callback(self):
+        result = dict(origCallback())
 
-                    printTimeLeft, printTimeLeftOrigin = estimator.estimate(progress,
-                                                                            printTime,
-                                                                            cleanedPrintTime,
-                                                                            statisticalTotalPrintTime,
-                                                                            statisticalTotalPrintTimeType)
+        file_completion = result['completion']
+        time_completion = None
+        if file_completion is not None:
+            if result['printTimeLeft'] < 0:
+                time_completion = 100.0
+            else:
+                time_completion = float(result['printTime']) * 100.00 / float(result['printTime'] + result['printTimeLeft'])
 
-                    if printTimeLeft is not None:
-                        time_progress = printTime / (printTime + printTimeLeft)
+        result.update(
+            completion=time_completion,
+            file_completion=file_completion,
+            time_completion=time_completion,
+        )
 
-            progress_int = int(progress * 1000)
-            if self._lastProgressReport != progress_int:
-                    self._lastProgressReport = progress_int
-                    self._reportPrintProgressToPlugins(int(time_progress * 100))
+        return self._dict(result)
 
-    return self._dict(
-                        completion=time_progress * 100 if time_progress is not None else None,
-                        file_completion=progress * 100 if progress is not None else None,
-                        filepos=filepos,
-                        printTime=int(printTime) if printTime is not None else None,
-                        printTimeLeft=int(printTimeLeft) if printTimeLeft is not None else None,
-                        printTimeLeftOrigin=printTimeLeftOrigin)
+    return callback
 
 
 class ProgressBasedOnTimePlugin(octoprint.plugin.SettingsPlugin,
@@ -75,9 +43,10 @@ class ProgressBasedOnTimePlugin(octoprint.plugin.SettingsPlugin,
                                 octoprint.plugin.StartupPlugin):
 
     ##~~ SettingsPlugin mixin
-
     def on_startup(self, host, port):
-        self._printer._stateMonitor._on_get_progress = types.MethodType(_updateProgressDataCallback, self._printer)
+        self._printer._stateMonitor._on_get_progress = types.MethodType(
+            progressCallBack(self._printer._stateMonitor._on_get_progress, self)
+        , self._printer)
 
     def get_settings_defaults(self):
         return dict(
@@ -122,6 +91,7 @@ class ProgressBasedOnTimePlugin(octoprint.plugin.SettingsPlugin,
 # ("OctoPrint-PluginSkeleton"), you may define that here. Same goes for the other metadata derived from setup.py that
 # can be overwritten via __plugin_xyz__ control properties. See the documentation for that.
 __plugin_name__ = "ProgressBasedOntime Plugin"
+__plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_load__():
     global __plugin_implementation__
@@ -131,3 +101,5 @@ def __plugin_load__():
     __plugin_hooks__ = {
         "octoprint.plugin.softwareupdate.check_config": __plugin_implementation__.get_update_information
     }
+
+

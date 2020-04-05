@@ -39,6 +39,8 @@ compatibility:
 
   octoprint:
   - 1.3.9
+  
+  python: ">=2.7,<3"
 
   # List of compatible operating systems
   #
