@@ -7,10 +7,18 @@
 $(function() {
     function ProgressBasedOnTimeViewModel(parameters) {
         var self = this;
+        self.printerState = parameters[0]
 
-        // assign the injected parameters, e.g.:
-        // self.loginStateViewModel = parameters[0];
-        // self.settingsViewModel = parameters[1];
+        // restore original data process to ensure JS interface can handle it properly.
+        self.onAfterBinding = function() {
+            const processProgressData = self.printerState._processProgressData.bind(self.printerState)
+            self.printerState._processProgressData = function(data) {
+                if (data.file_completion) {
+                    data.completion = data.file_completion
+                }
+                processProgressData(data)
+            }
+        }
     }
 
     /* view model class, parameters for constructor, container to bind to
@@ -19,9 +27,7 @@ $(function() {
      */
     OCTOPRINT_VIEWMODELS.push({
         construct: ProgressBasedOnTimeViewModel,
-        // ViewModels your plugin depends on, e.g. loginStateViewModel, settingsViewModel, ...
-        dependencies: [ /* "loginStateViewModel", "settingsViewModel" */ ],
-        // Elements to bind to, e.g. #settings_plugin_ProgressBasedOnTime, #tab_plugin_ProgressBasedOnTime, ...
-        elements: [ /* ... */ ]
+        dependencies: [ "printerStateViewModel" ],
+        elements: [ ]
     });
 });
