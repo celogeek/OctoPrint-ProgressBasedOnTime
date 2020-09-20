@@ -13,7 +13,7 @@ $(function() {
         self.onAfterBinding = function() {
             const processProgressData = self.printerState._processProgressData.bind(self.printerState)
             self.printerState._processProgressData = function(data) {
-                if (data.file_completion) {
+                if (data.hasOwnProperty('file_completion')) {
                     data.completion = data.file_completion
                 }
                 processProgressData(data)

@@ -19,12 +19,15 @@ def progressCallBack(origCallback, plugin):
         result = dict(origCallback())
 
         file_completion = result['completion']
+        printTime = result['printTime']
+        printTimeLeft = result['printTimeLeft']
         time_completion = None
-        if file_completion is not None:
-            if result['printTimeLeft'] < 0:
+
+        if file_completion is not None and printTime is not None and printTimeLeft is not None:
+            if printTimeLeft < 0:
                 time_completion = 100.0
             else:
-                time_completion = float(result['printTime']) * 100.00 / float(result['printTime'] + result['printTimeLeft'])
+                time_completion = float(printTime) * 100.00 / float(printTime + printTimeLeft)
 
         result.update(
             completion=time_completion,
